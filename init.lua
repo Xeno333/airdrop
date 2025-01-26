@@ -1,20 +1,20 @@
-airdrop = {
+serverdrop = {
     api = {},
 
-    code_loc = core.get_modpath("airdrop") .. "/src",
+    code_loc = core.get_modpath("serverdrop") .. "/src",
     storage = core.get_mod_storage()
 }
 
-airdrop.airdrop_ranges = core.deserialize(airdrop.storage:get_string("airdrop_ranges") or "") or {}
-airdrop.airdrop_items = core.deserialize(airdrop.storage:get_string("airdrop_items") or "") or {}
+serverdrop.serverdrop_ranges = core.deserialize(serverdrop.storage:get_string("serverdrop_ranges") or "") or {}
+serverdrop.serverdrop_items = core.deserialize(serverdrop.storage:get_string("serverdrop_items") or "") or {}
 
 
 
-dofile(airdrop.code_loc .. "/priv.lua")
-dofile(airdrop.code_loc .. "/api.lua")
-dofile(airdrop.code_loc .. "/conf.lua")
-dofile(airdrop.code_loc .. "/airdrop.lua")
-dofile(airdrop.code_loc .. "/do_airdrop.lua")
+dofile(serverdrop.code_loc .. "/priv.lua")
+dofile(serverdrop.code_loc .. "/api.lua")
+dofile(serverdrop.code_loc .. "/conf.lua")
+dofile(serverdrop.code_loc .. "/serverdrop.lua")
+dofile(serverdrop.code_loc .. "/do_serverdrop.lua")
 
 
 

@@ -1,20 +1,20 @@
-local airdrop_inv -- inv
+local serverdrop_inv -- inv
 
 
 local function update_inv()
     local c = 1
-    for _, v in pairs(airdrop.airdrop_items) do
-        airdrop_inv:set_size("main", c)
+    for _, v in pairs(serverdrop.serverdrop_items) do
+        serverdrop_inv:set_size("main", c)
 
         local stack = ItemStack(v.name)
         stack:set_count(v.max_count)
-        airdrop_inv:set_stack("main", c, stack)
+        serverdrop_inv:set_stack("main", c, stack)
 
         c = c + 1
     end
 
-    airdrop_inv:set_size("main", c )
-    airdrop_inv:set_stack("main", c, ItemStack(""))
+    serverdrop_inv:set_size("main", c )
+    serverdrop_inv:set_stack("main", c, ItemStack(""))
 end
 
 core.register_on_mods_loaded(update_inv)
@@ -25,11 +25,11 @@ core.register_on_mods_loaded(update_inv)
 
 -- Range
 
-function airdrop.api.register_range(range)
+function serverdrop.api.register_range(range)
     if range and range.max and range.min and type(range.max.x) == "number" and type(range.max.y) == "number" and type(range.max.z) == "number" and type(range.min.x) == "number" and type(range.min.y) == "number" and type(range.min.z) == "number" then
-        airdrop.airdrop_ranges[#airdrop.airdrop_ranges+1] = range
+        serverdrop.serverdrop_ranges[#serverdrop.serverdrop_ranges+1] = range
 
-        airdrop.storage:set_string("airdrop_ranges", core.serialize(airdrop.airdrop_ranges) or "")
+        serverdrop.storage:set_string("serverdrop_ranges", core.serialize(serverdrop.serverdrop_ranges) or "")
 
         return true
     end
@@ -41,17 +41,17 @@ end
 
 -- Loot
 
-function airdrop.api.register_loot(name, max_count, one_out_of_chance)
+function serverdrop.api.register_loot(name, max_count, one_out_of_chance)
     if not type(name) == "string" then return false end
 
-    if (not airdrop.airdrop_items[name]) and type(one_out_of_chance) == "number" and one_out_of_chance >= 1 and type(max_count) == "number" and max_count >= 1 then
-        airdrop.airdrop_items[name] = {
+    if (not serverdrop.serverdrop_items[name]) and type(one_out_of_chance) == "number" and one_out_of_chance >= 1 and type(max_count) == "number" and max_count >= 1 then
+        serverdrop.serverdrop_items[name] = {
             name = name,
             max_count = max_count,
             chance = one_out_of_chance
         }
 
-        airdrop.storage:set_string("airdrop_items", core.serialize(airdrop.airdrop_items) or "")
+        serverdrop.storage:set_string("serverdrop_items", core.serialize(serverdrop.serverdrop_items) or "")
 
         update_inv()
 
@@ -63,14 +63,14 @@ end
 
 
 -- Returns old def
-function airdrop.api.unregister_loot(name)
+function serverdrop.api.unregister_loot(name)
     if not type(name) == "string" then return false, nil, nil, nil end
 
-    if airdrop.airdrop_items[name] then
-        local def = airdrop.airdrop_items[name]
-        airdrop.airdrop_items[name] = nil
+    if serverdrop.serverdrop_items[name] then
+        local def = serverdrop.serverdrop_items[name]
+        serverdrop.serverdrop_items[name] = nil
 
-        airdrop.storage:set_string("airdrop_items", core.serialize(airdrop.airdrop_items) or "")
+        serverdrop.storage:set_string("serverdrop_items", core.serialize(serverdrop.serverdrop_items) or "")
 
         update_inv()
 
@@ -81,11 +81,11 @@ function airdrop.api.unregister_loot(name)
 end
 
 -- Returns old def
-function airdrop.api.get_loot_chance(name)
+function serverdrop.api.get_loot_chance(name)
     if not type(name) == "string" then return false, nil end
 
-    if airdrop.airdrop_items[name] then
-        return true, airdrop.airdrop_items[name].chance
+    if serverdrop.serverdrop_items[name] then
+        return true, serverdrop.serverdrop_items[name].chance
     end
 
     return false, nil
@@ -96,10 +96,10 @@ end
 
 -- Formspec
 
-function airdrop.make_formspec(item)
+function serverdrop.make_formspec(item)
     local formspec =  "formspec_version[3]size[14,8]"..
         "scroll_container[2,1;10,2;inv_scroll_bar;horizontal;0.1]"..
-        "list[detached:airdrop_inv;main;0,0;" .. airdrop_inv:get_size("main") .. ",1;]"..
+        "list[detached:serverdrop_inv;main;0,0;" .. serverdrop_inv:get_size("main") .. ",1;]"..
         "scroll_container_end[]"..
         "scrollbaroptions[arrows=show]scrollbar[0.2,0.5;0.5,3;vertical;inv_scroll_bar;0]"..
 
@@ -109,7 +109,7 @@ function airdrop.make_formspec(item)
     local inverse_items = {}
     
     local i = 0
-    for n, _ in pairs(airdrop.airdrop_items) do
+    for n, _ in pairs(serverdrop.serverdrop_items) do
         i = i + 1
         if i ~= 1 then
             formspec = formspec .. ","
@@ -129,7 +129,7 @@ function airdrop.make_formspec(item)
         index = items[item] or 1
     end
 
-    local done, chance = airdrop.api.get_loot_chance(inverse_items[index] or "")
+    local done, chance = serverdrop.api.get_loot_chance(inverse_items[index] or "")
     if not done or not chance then chance = "" end
  
  
@@ -147,7 +147,7 @@ end
 
 -- inv
 
-airdrop_inv = core.create_detached_inventory("airdrop_inv", {
+serverdrop_inv = core.create_detached_inventory("serverdrop_inv", {
     allow_move = function(_, _, _, _, _, _, _)
         return 0
     end,
@@ -155,7 +155,7 @@ airdrop_inv = core.create_detached_inventory("airdrop_inv", {
         local count = stack:get_count()
 
         stack:set_count(1)
-        if airdrop.airdrop_items[stack:to_string()] then
+        if serverdrop.serverdrop_items[stack:to_string()] then
             return 0
         end
 
@@ -168,14 +168,14 @@ airdrop_inv = core.create_detached_inventory("airdrop_inv", {
     on_put = function(inv, listname, index, stack, player)
         local count = stack:get_count()
         stack:set_count(1)
-        airdrop.api.register_loot(stack:to_string(), count, 100)
+        serverdrop.api.register_loot(stack:to_string(), count, 100)
 
-        core.show_formspec(player:get_player_name(), "airdrop_conf", airdrop.make_formspec())
+        core.show_formspec(player:get_player_name(), "serverdrop_conf", serverdrop.make_formspec())
     end,
     on_take = function(inv, listname, index, stack, player)
         stack:set_count(1)
-        airdrop.api.unregister_loot(stack:to_string())
-        core.show_formspec(player:get_player_name(), "airdrop_conf", airdrop.make_formspec())
+        serverdrop.api.unregister_loot(stack:to_string())
+        core.show_formspec(player:get_player_name(), "serverdrop_conf", serverdrop.make_formspec())
     end,
 })
 
